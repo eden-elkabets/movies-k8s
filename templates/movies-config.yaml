@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: movies-config
+  namespace: movies
+data:
+  REACT_APP_API_URL: "/api"

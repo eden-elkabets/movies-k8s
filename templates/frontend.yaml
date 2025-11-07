@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies-frontend
+  namespace: movies
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: movies-frontend
+  template:
+    metadata:
+      labels:
+        app: movies-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: edenel1/movies-app-frontend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: REACT_APP_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: movies-config
+                  key: REACT_APP_API_URL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: movies-frontend
+  namespace: movies
+spec:
+  selector:
+    app: movies-frontend
+  ports:
+    - port: 80
+      targetPort: 3000
+  type: ClusterIP

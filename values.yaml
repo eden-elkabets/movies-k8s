@@ -1,0 +1,9 @@
+mongo:
+  storage:
+    size: 5Gi
+    storageClassName: managed-csi
+backend:
+  replicas: 2
+
+frontend:
+  replicas: 2
