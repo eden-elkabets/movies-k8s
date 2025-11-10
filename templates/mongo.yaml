@@ -9,7 +9,5 @@ spec:
   resources:
     requests:
       storage: {{ .Values.mongo.pvc.size }}
-  {{- if .Values.mongo.pvc.storageClassName }}
   storageClassName: {{ .Values.mongo.pvc.storageClassName | quote }}
-  {{- end }}
 {{- end }}
