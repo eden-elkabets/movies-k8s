@@ -1,39 +1,43 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: movies-frontend
-  namespace: movies
+  name: mongo
 spec:
-  replicas: {{ .Values.frontend.replicas }}
+  replicas: 1
   selector:
     matchLabels:
-      app: movies-frontend
+      app: mongo
   template:
     metadata:
       labels:
-        app: movies-frontend
+        app: mongo
     spec:
       containers:
-        - name: frontend
-          image: edenel1/movies-app-frontend:latest
+        - name: mongo
+          image: "{{ .Values.mongo.image.repository }}:{{ .Values.mongo.image.tag }}"
+          imagePullPolicy: {{ .Values.mongo.image.pullPolicy }}
           ports:
-            - containerPort: 3000
-          env:
-            - name: REACT_APP_API_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: movies-config
-                  key: REACT_APP_API_URL
+            - containerPort: {{ .Values.mongo.port }}
+          volumeMounts:
+            - name: mongo-storage
+              mountPath: /data/db
+      volumes:
+        - name: mongo-storage
+          {{- if .Values.mongo.pvc.enabled }}
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: movies-frontend
-  namespace: movies
+  name: mongo
 spec:
   selector:
-    app: movies-frontend
+    app: mongo
   ports:
-    - port: 80
-      targetPort: 3000
+    - port: {{ .Values.mongo.port }}
+      targetPort: {{ .Values.mongo.port }}
   type: ClusterIP

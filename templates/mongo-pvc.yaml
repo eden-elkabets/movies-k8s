@@ -1,12 +1,15 @@
+{{- if .Values.mongo.pvc.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mongo-pvc
-  namespace: movies
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.mongo.storage.size | default "5Gi" }}
-  storageClassName: {{ .Values.mongo.storage.storageClassName | quote }}
+      storage: {{ .Values.mongo.pvc.size }}
+  {{- if .Values.mongo.pvc.storageClassName }}
+  storageClassName: {{ .Values.mongo.pvc.storageClassName | quote }}
+  {{- end }}
+{{- end }}

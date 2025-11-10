@@ -1,40 +1,15 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: mongo
-  namespace: movies
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: mongo
-  template:
-    metadata:
-      labels:
-        app: mongo
-    spec:
-      containers:
-        - name: mongo
-          image: mongo:6
-          ports:
-            - containerPort: 27017
-          volumeMounts:
-            - name: mongo-storage
-              mountPath: /data/db
-      volumes:
-        - name: mongo-storage
-          persistentVolumeClaim:
-            claimName: mongo-pvc
----
+{{- if .Values.mongo.pvc.enabled }}
 apiVersion: v1
-kind: Service
+kind: PersistentVolumeClaim
 metadata:
-  name: mongo
-  namespace: movies
+  name: mongo-pvc
 spec:
-  selector:
-    app: mongo
-  ports:
-    - port: 27017
-      targetPort: 27017
-  type: ClusterIP
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.mongo.pvc.size }}
+  {{- if .Values.mongo.pvc.storageClassName }}
+  storageClassName: {{ .Values.mongo.pvc.storageClassName | quote }}
+  {{- end }}
+{{- end }}

@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: movies-backend
-  namespace: movies
 spec:
   replicas: {{ .Values.backend.replicas }}
   selector:
@@ -15,9 +14,10 @@ spec:
     spec:
       containers:
         - name: movies-backend
-          image: edenel1/movies-app-backend:latest
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
           ports:
-            - containerPort: 3000
+            - containerPort: {{ .Values.backend.containerPort }}
           env:
             - name: MONGO_URL
               valueFrom:
@@ -29,11 +29,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: movies-backend
-  namespace: movies
 spec:
   selector:
     app: movies-backend
   ports:
-    - port: 5000
-      targetPort: 3000
+    - port: {{ .Values.backend.servicePort }}
+      targetPort: {{ .Values.backend.containerPort }}
   type: ClusterIP
