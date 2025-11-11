@@ -8,7 +8,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.mongo.pvc.size }}
+      storage: {{ .Values.mongo.pvc.size | quote }}
   {{- if .Values.mongo.pvc.storageClassName }}
   storageClassName: {{ .Values.mongo.pvc.storageClassName | quote }}
   {{- end }}
