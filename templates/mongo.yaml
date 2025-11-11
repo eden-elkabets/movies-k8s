@@ -1,7 +1,9 @@
+{{- if (.Values.mongo.enabled | default true) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mongo
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   selector:
@@ -13,31 +15,29 @@ spec:
         app: mongo
     spec:
       containers:
-        - name: mongo
-          image: {{ .Values.mongo.image.repository }}:{{ .Values.mongo.image.tag }}
-          imagePullPolicy: {{ .Values.mongo.image.pullPolicy }}
-          ports:
-            - containerPort: {{ .Values.mongo.port }}
-          volumeMounts:
-            {{- if .Values.mongo.pvc.enabled }}
-            - name: mongo-storage
-              mountPath: /data/db
-            {{- end }}
-      volumes:
-        {{- if .Values.mongo.pvc.enabled }}
+      - name: mongo
+        image: "{{ .Values.mongo.image.repository }}:{{ .Values.mongo.image.tag }}"
+        imagePullPolicy: {{ .Values.mongo.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.mongo.port }}
+        volumeMounts:
         - name: mongo-storage
-          persistentVolumeClaim:
-            claimName: mongo-pvc
-        {{- end }}
+          mountPath: /data/db
+      volumes:
+      - name: mongo-storage
+        persistentVolumeClaim:
+          claimName: mongo-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: mongo
+  namespace: {{ .Release.Namespace }}
 spec:
+  type: ClusterIP
   selector:
     app: mongo
   ports:
-    - port: {{ .Values.mongo.port }}
-      targetPort: {{ .Values.mongo.port }}
-  type: ClusterIP
+  - port: {{ .Values.mongo.port }}
+    targetPort: {{ .Values.mongo.port }}
+{{- end }}
