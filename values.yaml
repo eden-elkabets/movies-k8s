@@ -1,9 +1,35 @@
-mongo:
-  storage:
-    size: 5Gi
-    storageClassName: managed-csi
 backend:
+  image:
+    repository: edenel1/movies-app-backend
+    tag: latest
+    pullPolicy: IfNotPresent
   replicas: 2
+  containerPort: 3000
+  servicePort: 5000
+  mongoUrl: ""
 
 frontend:
+  image:
+    repository: edenel1/movies-app-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
   replicas: 2
+  containerPort: 3000
+  servicePort: 80
+  apiUrl: "/api"
+
+mongo:
+  image:
+    repository: mongo
+    tag: "6"
+    pullPolicy: IfNotPresent
+  port: 27017
+  pvc:
+    enabled: true
+    size: 5Gi
+    storageClassName: default
+
+ingress:
+  enabled: true
+  className: nginx
+  host: "" 

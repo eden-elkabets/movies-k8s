@@ -1,4 +1,6 @@
-{{- if .Values.mongo.pvc.enabled }}
+{{- with .Values.mongo }}
+{{- with .pvc }}
+{{- if .enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -8,6 +10,10 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.mongo.pvc.size }}
-  storageClassName: {{ .Values.mongo.pvc.storageClassName | quote }}
+      storage: {{ .size | default "5Gi" }}
+  {{- if .storageClassName }}
+  storageClassName: {{ .storageClassName | quote }}
+  {{- end }}
+{{- end }}
+{{- end }}
 {{- end }}
